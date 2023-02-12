@@ -21,8 +21,8 @@ class _HomeState extends State<Home> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Image.asset('assets/intro.png'),
-            Text('تطبق المهام',style: TextStyle(fontSize: 50),),
-            Text('تطبق المهام'),
+            Text('تطبيق المهام',style: TextStyle(fontSize: 50),),
+            Text('تطبيق المهام'),
           ],
         ),
       ),
