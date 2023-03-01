@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         fontFamily: ArabicThemeData.font(arabicFont: ArabicFont.iBMPlexSansArabic),
      package: ArabicThemeData.package,
-      appBarTheme: const AppBarTheme( elevation: 0, color: Colors.black),
+      appBarTheme: const AppBarTheme( elevation: 0, color: Colors.white),
      colorScheme: ColorScheme.fromSwatch().copyWith(
         primary: mainColor,
        onSecondary: mainColor,
