@@ -1,5 +1,8 @@
 
 import 'package:flutter/cupertino.dart';
+import 'package:localstore/localstore.dart';
+
+final db= Localstore.instance;
 
 class Sizee<Size>{
  

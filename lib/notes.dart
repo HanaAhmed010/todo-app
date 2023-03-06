@@ -1,3 +1,4 @@
+import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:myfirstapp/settings/colors.dart';
 import 'package:myfirstapp/settings/keys.dart';
@@ -12,39 +13,141 @@ class Notes extends StatefulWidget {
 }
 
 class _NotesState extends State<Notes> {
-  List<Map<String,dynamic>> todo=[
-    {
-      'title':"Clean my car",
-      'done':false,
-      'id':"asd122",
-      'date':"12/12/2023"
-    
-    },
-    {
-      'title':"Clean my car22222",
-      'done':false,
-      'id':"asd122",
-      'date':"12/12/2023"
-
-    },
-    {
-      'title':"Clean my car3333",
-      'done':false,
-      'id':"asd122",
-      'date':"12/12/2023"
-
-    }
-  ];
+  TextEditingController todoText=TextEditingController();
+  List<Map<String,dynamic>> todo=[];
+ 
   bool v=true;
+  
+
+  create()async{
+    final id =db.collection("toods").doc().id;
+    await db.collection('todos').doc(id).set({
+      'id':id,
+      'title':todoText.text,
+      'done':false,
+      'date':formatDate(DateTime.now(), [yyyy,'/' , mm,'/',dd, " - ", h,':',nn,':',ss,"  ", am])
+    });
+    todoText.clear();
+
+    Navigator.pop(context);
+    
+  }
+  
+  getTodo() async{
+    db.collection('todos').stream.listen((event) { 
+     setState(() {
+       todo.add(event);
+       todo.sort((a,b)=>(a['date']).compareTo(b['date']));
+     });
+    });
+    print(todo);
+  }
+  
+  delete(id) async{
+   await db.collection('todos').doc(id).delete().then((value) => {
+     print(id),
+
+      todo.removeWhere((element) => element['id']==id)
+    });
+    
+  }
+  
+  update(id,title,done,date) async{
+    await db.collection('todos').doc(id).set({
+      'id':id,
+      'title':title,
+      'done':done,
+      'date':date
+      
+    }).then((value) => {
+     
+      todo.removeWhere((element) => element['id']==id)
+    });
+    
+  }
+  @override
+  void initState() {
+
+    getTodo();
+    // TODO: implement initState
+    super.initState();
+  }
+  
   @override
   Widget build(BuildContext context) {
+    print('2');
     return Scaffold(
       // floatingActionButton: FloatingActionButton(onPressed: () {  },
       // child:Icon(Icons.add,color: textColor,size: 30,) ,),
       appBar: AppBar(
-        title: Text("المهام", style: TextStyle(fontSize: 20,color: textColor,fontWeight: FontWeight.bold),),
+        title: Text(" المهام", style: TextStyle(fontSize: 20,color: textColor,fontWeight: FontWeight.bold),),
         actions: [
-          IconButton(onPressed: (){}, icon: Icon(Icons.add,color: textColor,size: 30,))
+          IconButton(onPressed: (){
+           print(DateTime.now());
+            showModalBottomSheet(
+              isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                context: context,
+                builder: (_){
+                  return Container(
+                    padding: EdgeInsets.symmetric(vertical: 20),
+                    height: Sizee.height(context)*0.6,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(topRight: Radius.circular(10),topLeft:  Radius.circular(10))
+                    ),
+                    
+                    child: Column(
+                      children: [
+                        Text("اضافة مهام" ,style: TextStyle(fontSize: 17,fontWeight: FontWeight.bold),),
+                        
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 20,vertical: 5),
+                          margin: EdgeInsets.symmetric(vertical: 15),
+                          width: Sizee.width(context)*0.9,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade100,
+                            borderRadius: BorderRadius.circular(15)
+                          ),
+                          child: TextField(
+                            controller: todoText,
+                            decoration: InputDecoration(
+                              icon: Icon(Icons.edit),
+                              border: InputBorder.none
+                            ),
+                            
+                            
+                          ),
+                          
+                          
+                        ),
+                        
+                        SizedBox(
+                          width: Sizee.width(context)*0.9,
+                          height: 40,
+                          child: ElevatedButton(
+                            style: ButtonStyle(
+                              shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15)
+                              )),
+                            ),
+                            onPressed: () {
+                              create();
+                              
+                            },
+                          child: Text("اضافة"),),
+                        )
+                      ],
+                    ),
+                  );
+                }
+            
+            
+            );
+            
+            
+          }, icon: Icon(Icons.add,color: textColor,size: 30,))
         ],
         
       ),
@@ -62,8 +165,11 @@ class _NotesState extends State<Notes> {
               setState(() {
                 todo[index]['done']=!todo[index]['done'];
               });
-              // print(" hehehehehe");
+              
             },
+          onLongPress: (){
+            delete(todo[index]['id']);
+          },
             child: Container(
               width: Sizee.width(context),
               height: 100,
@@ -87,9 +193,9 @@ height: Sizee.height(context),
                                 value:  todo[index]['done'] , 
                                 
                                 onChanged: (value){
-                         setState(() {
-                           v=!value!;
-                         }); },
+                                  update(todo[index]['id'],todo[index]['title'],value,todo[index]['date']);
+                         
+                         },
                               
                               
                               

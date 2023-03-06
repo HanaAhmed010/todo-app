@@ -38,6 +38,8 @@ dependencies:
   jelly_anim: ^0.0.7
   date_format: ^2.0.7
   arabic_font: ^0.0.7
+  localstore: ^1.3.5
+
 
 
 dev_dependencies:
